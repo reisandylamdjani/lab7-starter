@@ -24,6 +24,7 @@ function getRecipesFromStorage() {
 	// A9. TODO - Complete the functionality as described in this function
 	//           header. It is possible in only a single line, but should
 	//           be no more than a few lines.
+	return JSON.parse(localStorage.getItem('recipes') || '[]');
 }
 
 /**
@@ -39,6 +40,12 @@ function addRecipesToDocument(recipes) {
 	//            create a <recipe-card> element for each one, and populate
 	//            each <recipe-card> with that recipe data using element.data = ...
 	//            Append each element to <main>
+	const mainEl = document.querySelector('main');
+	for(let i = 0; i < recipes.length; i++) {
+		let newRecipeCardEl = document.createElement('recipe-card');
+		newRecipeCardEl.data = recipes[i];
+		mainEl.append(newRecipeCardEl);
+	}
 }
 
 /**
@@ -51,6 +58,7 @@ function saveRecipesToStorage(recipes) {
 	// B1. TODO - Complete the functionality as described in this function
 	//            header. It is possible in only a single line, but should
 	//            be no more than a few lines.
+	localStorage.setItem('recipes', JSON.stringify(recipes));
 }
 
 /**
@@ -76,4 +84,32 @@ function initFormHandler() {
 	// Steps B12 & B13 will occur inside the event listener from step B11
 	// B12. TODO - Clear the local storage
 	// B13. TODO - Delete the contents of <main>
+
+	const formEl = document.querySelector('form');
+	formEl.addEventListener('submit', function(event) {
+		let newFormData = new FormData(formEl);
+		let recipeObject = {};
+		for(let val of newFormData) {
+			let key = val[0];
+			let value = val[1];
+			recipeObject[key] = value;
+		}
+		let newRecipeCardEl = document.createElement('recipe-card');
+		newRecipeCardEl.data = recipeObject;
+
+		const mainEl = document.querySelector('main');
+		mainEl.append(newRecipeCardEl);
+
+		let recipes = getRecipesFromStorage();
+		recipes.push(recipeObject);
+		saveRecipesToStorage(recipes);
+	});
+
+	const clearButton = document.querySelector('button.danger');
+	clearButton.addEventListener('click', function(event) {
+		localStorage.clear();
+		const mainEl = document.querySelector('main');
+		mainEl.innerHTML = '';
+	});
+
 }
